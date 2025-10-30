@@ -532,8 +532,14 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    food_list = food_grid.as_list()
 
+    if len(food_list) == 0:
+        return 0
+
+    distances = [maze_distance(position, food, problem.starting_game_state) for food in food_list]
+
+    return max(distances)
 
 def simplified_corners_heuristic(state, problem):
     """
