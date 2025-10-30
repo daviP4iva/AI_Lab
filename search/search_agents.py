@@ -532,6 +532,11 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
+    """
+    We knew we wanted to use the maze_distance method to calculate the heuristic. The first intuition was to return 
+    the min distance., however that did not work as expected. We also tried the average, and lastly the max, which worked best for us.
+    We return the max distance because is the most approximate result to the complete problem.
+    """
     food_list = food_grid.as_list()
 
     if len(food_list) == 0:

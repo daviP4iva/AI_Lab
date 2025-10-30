@@ -133,6 +133,11 @@ def depth_first_search(problem):
     print("Start's successors:", problem.get_successors(problem.get_start_state()))
     """
     "*** YOUR CODE HERE ***"
+    """
+    This method implements a stack for the frontier and a set for the nodesvisited. For each node visited we check if the children is already in the
+    nodesVisited or in the frontier. If not, we add the child in the frontier. The next node expanded is the last node added to the frontier. 
+    When we find a goal state, we stop expanding nodes and we return the path.
+    """
     
     nodesVisited = set()
     frontier = util.Stack()
@@ -157,6 +162,11 @@ def depth_first_search(problem):
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    """
+    This method implements a set for the nodes visited and a Queue for the frontier. For each node visited we check if the children 
+    is already in the nodesVisited or in the frontier. If not, we add the child in the frontier. The next node expanded is the first node added in chronological order. 
+    When we find a goal state, we stop expanding nodes and we return the path.
+    """
     nodesVisited = set()
     frontier = util.Queue()
     currentNode = SearchNode(None, (problem.get_start_state(), None, 0))
@@ -185,6 +195,12 @@ def breadth_first_search(problem):
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    """
+    This method implements a set for the nodes visited and a PriorityQueue for the frontier. For each node visited we check if the children 
+    is already in the nodesVisited. If not, we add the child in the frontier by updating the frontier. The priority is set by the cost to arrive to the child.
+    The next node expanded is the one with the lowest cost but we check if we haven't visited that node before with another path. 
+    When we find a goal state, we stop expanding nodes and we return the path.
+    """
     
     nodesVisited = set()
     frontier = util.PriorityQueue()
@@ -218,6 +234,12 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    """
+    This method implements a set for the nodes visited and a PriorityQueue for the frontier. For each node visited we check if the children 
+    is already in the nodesVisited. If not, we add the child in the frontier by updating the frontier. The priority is set by the sum of the cost to arrive to the child plus the heuristic.
+    The next node expanded is the one with the lowest cost but we check if we haven't visited that node before with another path. 
+    When we find a goal state, we stop expanding nodes and we return the path.
+    """
     
     nodesVisited = set()
     frontier = util.PriorityQueue()
