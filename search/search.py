@@ -165,7 +165,15 @@ def breadth_first_search(problem):
         nodesVisited.add(currentNode.state)
         for child in problem.get_successors(currentNode.state):
             nodeChild = SearchNode(currentNode,child)
-            if frontier.contains(nodeChild.state) or nodesVisited.__contains__(nodeChild.state):
+
+            frontier_contains_node = False
+
+            for coord in frontier.list:
+                if coord.state == nodeChild.state:
+                    frontier_contains_node = True
+                    break
+
+            if frontier_contains_node or nodesVisited.__contains__(nodeChild.state):
                 continue
             else:
                 frontier.push(nodeChild)
