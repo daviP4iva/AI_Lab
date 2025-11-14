@@ -52,21 +52,12 @@ class ReflexAgent(Agent):
         return legal_moves[chosen_index]
 
     def evaluation_function(self, current_game_state, action):
-        """
-        Design a better evaluation function here.
-
-        The evaluation function takes in the current and proposed successor
-        GameStates (pacman.py) and returns a number, where higher numbers are better.
-
-        The code below extracts some useful information from the state, like the
-        remaining food (new_food) and Pacman position after moving (new_pos).
-        new_scared_times holds the number of moves that each ghost will remain
-        scared because of Pacman having eaten a power pellet.
-
-        Print out these variables to see what you're getting, then combine them
-        to create a masterful evaluation function.
-        """
-        # Useful information you can extract from a GameState (pacman.py)
+        # Evaluates how good a particular action is for Pacman.
+        # This function estimates the value of the resulting state 
+        # after Pacman takes the given action.
+        # It encourages Pacman to move closer to food while avoiding
+        # ghosts, returning a higher score for safer and more rewarding
+        # positions.
         successor_game_state = current_game_state.generate_pacman_successor(action)
         new_pos = successor_game_state.get_pacman_position()
         new_food = successor_game_state.get_food()
@@ -129,30 +120,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def get_action(self, game_state):
-        """
-        Returns the minimax action from the current game_state using self.depth
-        and self.evaluation_function.
-
-        Here are some method calls that might be useful when implementing minimax.
-
-        game_state.get_legal_actions(agent_index):
-        Returns a list of legal actions for an agent
-        agent_index=0 means Pacman, ghosts are >= 1
-
-        game_state.generate_successor(agent_index, action):
-        Returns the successor game state after an agent takes an action
-
-        game_state.get_num_agents():
-        Returns the total number of agents in the game
-
-        game_state.is_win():
-        Returns whether or not the game state is a winning state
-
-        game_state.is_lose():
-        Returns whether or not the game state is a losing state
-        """
-        "*** YOUR CODE HERE ***"
-        
+        # Main function that decides Pacman's best move.
+        # It iterates through all legal actions for Pacman (agent 0),
+        # generates the successor states, and evaluates them using minimax (minAction).
+        # Returns the action that maximizes the expected evaluation score. ✡️
         maxScore = -float('inf')
         bestAction = None
         for moves in game_state.get_legal_actions(0):
@@ -164,6 +135,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             
 
     def maxAction(self, game_state, depth):
+        # Represents Pacman's (MAX) turn.
+        # If a terminal state is reached (win/lose) or the maximum search depth,
+        # it returns the evaluation of the current game state.
+        # Otherwise, it generates all successors and returns the highest value
+        # among those returned by the ghosts' (minAction) moves.
         if game_state.is_win() or game_state.is_lose() or depth == self.depth * 2:
             return self.evaluation_function(game_state)
 
@@ -176,6 +152,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return maxScore
 
     def minAction(self, game_state, agent_index, depth):
+        # Represents the ghosts’ (MIN) turn.
+        # If a terminal state is reached or the maximum depth is hit, it evaluates the state.
+        # For each legal ghost action, it generates a successor state.
+        # If the next agent is Pacman, it calls maxAction and increases the depth.
+        # If there are more ghosts, it continues recursively with minAction without increasing depth.
+        # Returns the minimum score among all possible ghost actions,
+        # since ghosts try to minimize Pacman’s advantage. 
         if game_state.is_win() or game_state.is_lose() or depth == self.depth * 2:
             return self.evaluation_function(game_state)
 
@@ -201,9 +184,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
 
     def get_action(self, game_state):
-        """
-        Returns the minimax action using self.depth and self.evaluation_function
-        """
+        # Entry point: choose Pacman's action using minimax with alpha-beta pruning.
+        # Initializes alpha and beta bounds and searches over all legal actions for Pacman (agent 0).
+        # For each action, it generates the successor state and evaluates it from the ghosts' (MIN) side.
+        # Tracks the best action by the highest returned value and updates alpha to enable pruning in deeper calls.
+        # Returns the action that maximizes the evaluation at the root.
         alpha = -float('inf')
         beta = float('inf')
         maxScore = -float('inf')
@@ -219,6 +204,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             
 
     def alfaPruning(self, game_state, depth, alfa, beta):
+        # MAX node: Pacman's turn.
+        # Terminal check: if win/lose or depth limit reached, return heuristic evaluation.
+        # Otherwise, iterate over Pacman's legal actions, recurse into MIN, and keep the maximum score.
+        # Update alpha with the best score found so far; if alpha exceeds beta, prune remaining branches.
         if game_state.is_win() or game_state.is_lose() or depth == self.depth * 2:
             return self.evaluation_function(game_state)
 
@@ -235,6 +224,11 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         return maxScore
 
     def betaPruning(self, game_state, agent_index, depth, alfa, beta):
+        # MIN node(s): ghosts' turns.
+        # Terminal check: if win/lose or depth limit reached, return heuristic evaluation.
+        # For each ghost action, generate the successor and move to the next agent.
+        # Depth increases only when control returns to Pacman (next_agent == 0); between ghosts, depth stays the same.
+        # Keep the minimum score across actions, update beta, and prune when alpha >= beta.
         if game_state.is_win() or game_state.is_lose() or depth == self.depth * 2:
             return self.evaluation_function(game_state)
 
