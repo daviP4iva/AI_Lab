@@ -204,14 +204,17 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         """
         Returns the minimax action using self.depth and self.evaluation_function
         """
-        "*** YOUR CODE HERE ***"
+        alpha = -float('inf')
+        beta = float('inf')
         maxScore = -float('inf')
         bestAction = None
-        for moves in game_state.get_legal_actions(0):
-            successor = game_state.generate_successor(0,moves)
-            value = self.betaPruning(successor,1,1, -float('inf'), float('inf'))
-            if(value > maxScore or bestAction == None):
-                maxScore,bestAction = value,moves
+        for action in game_state.get_legal_actions(0):
+            successor = game_state.generate_successor(0, action)
+            value = self.betaPruning(successor, 1, 1, alpha, beta)
+            if bestAction is None or value > maxScore:
+                maxScore, bestAction = value, action
+            if maxScore > alpha:
+                alpha = maxScore
         return bestAction
             
 
@@ -222,10 +225,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         maxScore = -float('inf')
         for action in game_state.get_legal_actions(0):
             successor = game_state.generate_successor(0, action)
-            score = self.betaPruning(successor, 1, depth + 1, max(alfa,maxScore),beta)
+            score = self.betaPruning(successor, 1, depth + 1, alfa, beta)
             if score > maxScore:
                 maxScore = score
-            if maxScore >= beta:
+            if maxScore > alfa:
+                alfa = maxScore
+            if alfa > beta:
                 return maxScore
         return maxScore
 
@@ -234,21 +239,23 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return self.evaluation_function(game_state)
 
         minScore = float('inf')
+        num_agents = game_state.get_num_agents()
         for action in game_state.get_legal_actions(agent_index):
             successor = game_state.generate_successor(agent_index, action)
-            num_agents = game_state.get_num_agents()
             next_agent = (agent_index + 1) % num_agents
 
             if next_agent == 0:
-                score = self.alfaPruning(successor, depth + 1, alfa, min(beta,minScore))
-                if minScore <= alfa and agent_index == num_agents-1:
-                    return minScore
+                score = self.alfaPruning(successor, depth + 1, alfa, beta)
             else:
                 score = self.betaPruning(successor, next_agent, depth, alfa, beta)
-
+    
             if score < minScore:
-                minScore = score               
-            
+                minScore = score
+            if minScore < beta:
+                beta = minScore
+            if alfa > beta:
+                return minScore
+
         return minScore
 
 
