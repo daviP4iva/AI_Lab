@@ -205,7 +205,51 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluation_function
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        maxScore = -float('inf')
+        bestAction = None
+        for moves in game_state.get_legal_actions(0):
+            successor = game_state.generate_successor(0,moves)
+            value = self.betaPruning(successor,1,1, -float('inf'), float('inf'))
+            if(value > maxScore or bestAction == None):
+                maxScore,bestAction = value,moves
+        return bestAction
+            
+
+    def alfaPruning(self, game_state, depth, alfa, beta):
+        if game_state.is_win() or game_state.is_lose() or depth == self.depth * 2:
+            return self.evaluation_function(game_state)
+
+        maxScore = -float('inf')
+        for action in game_state.get_legal_actions(0):
+            successor = game_state.generate_successor(0, action)
+            score = self.betaPruning(successor, 1, depth + 1, max(alfa,maxScore),beta)
+            if score > maxScore:
+                maxScore = score
+            if maxScore >= beta:
+                return maxScore
+        return maxScore
+
+    def betaPruning(self, game_state, agent_index, depth, alfa, beta):
+        if game_state.is_win() or game_state.is_lose() or depth == self.depth * 2:
+            return self.evaluation_function(game_state)
+
+        minScore = float('inf')
+        for action in game_state.get_legal_actions(agent_index):
+            successor = game_state.generate_successor(agent_index, action)
+            num_agents = game_state.get_num_agents()
+            next_agent = (agent_index + 1) % num_agents
+
+            if next_agent == 0:
+                score = self.alfaPruning(successor, depth + 1, alfa, min(beta,minScore))
+                if minScore <= alfa and agent_index == num_agents-1:
+                    return minScore
+            else:
+                score = self.betaPruning(successor, next_agent, depth, alfa, beta)
+
+            if score < minScore:
+                minScore = score               
+            
+        return minScore
 
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
